@@ -7,9 +7,6 @@ import 'package:intelloreassignment/view/movie_detail_screen.dart';
 import 'package:intelloreassignment/view/movie_shimmer_card.dart';
 import 'package:shimmer/shimmer.dart';
 
-
-
-
 class MovieSearchPage extends StatefulWidget {
   MovieSearchPage({Key key, this.title}) : super(key: key);
 
@@ -22,6 +19,7 @@ class MovieSearchPage extends StatefulWidget {
 class _MovieSearchPageState extends State<MovieSearchPage> {
   HomeBloc _searchBloc;
   TextEditingController searchController;
+
   @override
   void initState() {
     super.initState();
@@ -53,7 +51,7 @@ class _MovieSearchPageState extends State<MovieSearchPage> {
                     },
                   ),
                   Expanded(
-                    child:  Text(
+                    child: Text(
                       'Search',
                       style: TextStyle(
                         fontSize: 20.0,
@@ -67,7 +65,7 @@ class _MovieSearchPageState extends State<MovieSearchPage> {
               TextField(
                 controller: searchController,
                 textInputAction: TextInputAction.search,
-                onSubmitted: (value){
+                onSubmitted: (value) {
                   searchMovie(resetSearch: true);
                 },
                 decoration: InputDecoration(
@@ -94,7 +92,9 @@ class _MovieSearchPageState extends State<MovieSearchPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 18,),
+              SizedBox(
+                height: 18,
+              ),
               Expanded(
                 child: StreamBuilder<List<Movie>>(
                     stream: _searchBloc.searchMoviesStream,
@@ -104,31 +104,38 @@ class _MovieSearchPageState extends State<MovieSearchPage> {
                         return NotificationListener<ScrollNotification>(
                           // ignore: missing_return
                           onNotification: (ScrollNotification scrollInfo) {
-                            if (_searchBloc.isLoadMore() && !_searchBloc.isLoadingBS.value && scrollInfo.metrics.pixels ==
-                                scrollInfo.metrics.maxScrollExtent) {
-                              searchMovie(page:(_searchBloc.currentPage+1).toString());
-                             _searchBloc.addIsLoading(true);
+                            if (_searchBloc.isLoadMore() &&
+                                !_searchBloc.isLoadingBS.value &&
+                                scrollInfo.metrics.pixels ==
+                                    scrollInfo.metrics.maxScrollExtent) {
+                              searchMovie(
+                                  page:
+                                      (_searchBloc.currentPage + 1).toString());
+                              _searchBloc.addIsLoading(true);
                             }
                           },
-                          child: ListView.builder(
-                              padding: const EdgeInsets.all(2),
-                              itemCount: popularMovies.length,
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (BuildContext context, int index) {
-                                Movie searchMovie = popularMovies[index];
-                                return MovieCard(width: width,
-                                    movie: searchMovie);
-                              }),
+                          child: GridView.builder(
+                            itemCount: popularMovies.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2),
+                            itemBuilder: (BuildContext context, int index) {
+                              Movie popularMovie = popularMovies[index];
+                              return MovieCard(
+                                  width: width, movie: popularMovie);
+                            },
+                          ),
                         );
                       } else {
                         return Shimmer.fromColors(
                           baseColor: Colors.grey[300],
                           highlightColor: Colors.grey[100],
                           enabled: true,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: 4,
-                            scrollDirection: Axis.vertical,
+                          child: GridView.builder(
+                            itemCount: 8,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2),
                             itemBuilder: (BuildContext context, int index) {
                               return NowPlayingMovieShimmerCard(width);
                             },
@@ -138,18 +145,17 @@ class _MovieSearchPageState extends State<MovieSearchPage> {
                     }),
               ),
               StreamBuilder<bool>(
-                stream: _searchBloc.isLoadingStream,
-                builder: (context, snapshot) {
-                  return Container(
-                    height: snapshot.data ? 50.0 : 0,
-                    color: Colors.transparent,
-                    child: Center(
-                      child: new CircularProgressIndicator(),
-                    ),
-                  );
-                }
-              ),
-
+                  stream: _searchBloc.isLoadingStream,
+                  initialData: false,
+                  builder: (context, snapshot) {
+                    return Container(
+                      height: snapshot.data ? 50.0 : 0,
+                      color: Colors.transparent,
+                      child: Center(
+                        child: new CircularProgressIndicator(),
+                      ),
+                    );
+                  }),
             ],
           ),
         ),
@@ -158,23 +164,18 @@ class _MovieSearchPageState extends State<MovieSearchPage> {
     );
   }
 
-
   @override
   void dispose() {
-   _searchBloc.dispose();
+    _searchBloc.dispose();
     super.dispose();
   }
 
-  void searchMovie({String page = "1",bool resetSearch = false}){
+  void searchMovie({String page = "1", bool resetSearch = false}) {
     _searchBloc.totalPages = 1;
     _searchBloc.currentPage = 1;
-    if(resetSearch){
-    _searchBloc.addSearchMovies(new List<Movie>());
+    if (resetSearch) {
+      _searchBloc.addSearchMovies(new List<Movie>());
     }
-    _searchBloc.searchMovies(query: searchController.text,page:page);
+    _searchBloc.searchMovies(query: searchController.text, page: page);
   }
 }
-
-
-
-

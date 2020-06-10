@@ -13,7 +13,7 @@ class NowPlayingMovieShimmerCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(15.0),
       ),
       child: Container(
-        height: 300,
+        height: 150,
         width: width * 0.75,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(8.0)),

@@ -64,12 +64,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   Icon(
                     Icons.menu,
                   ),
-
                   IconButton(
                     icon: Icon(
                       Icons.search,
                     ),
-                    onPressed: (){
+                    onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -91,7 +90,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-              SizedBox(height: 18,),
+              SizedBox(
+                height: 18,
+              ),
               Expanded(
                 child: StreamBuilder<List<Movie>>(
                     stream: _homeBloc.nowPlayingMoviesStream,
@@ -101,32 +102,39 @@ class _MyHomePageState extends State<MyHomePage> {
                         return NotificationListener<ScrollNotification>(
                           // ignore: missing_return
                           onNotification: (ScrollNotification scrollInfo) {
-                            if (_homeBloc.isLoadMore() && !_homeBloc.isLoadingBS.value && scrollInfo.metrics.pixels ==
-                                scrollInfo.metrics.maxScrollExtent) {
-                              _homeBloc.getNowPlayingMovies((_homeBloc.currentPage+1).toString());
-                             _homeBloc.addIsLoading(true);
+                            if (_homeBloc.isLoadMore() &&
+                                !_homeBloc.isLoadingBS.value &&
+                                scrollInfo.metrics.pixels ==
+                                    scrollInfo.metrics.maxScrollExtent) {
+                              _homeBloc.getNowPlayingMovies(
+                                  (_homeBloc.currentPage + 1).toString());
+                              _homeBloc.addIsLoading(true);
                             }
                           },
-                          child: ListView.builder(
-                              padding: const EdgeInsets.all(2),
-                              itemCount: popularMovies.length,
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (BuildContext context, int index) {
-                                Movie popularMovie = popularMovies[index];
-                                return MovieCard(
-                                    width: width,
-                                    movie: popularMovie);
-                              }),
+                          child:
+
+                              GridView.builder(
+                            itemCount: popularMovies.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2),
+                            itemBuilder: (BuildContext context, int index) {
+                              Movie popularMovie = popularMovies[index];
+                              return MovieCard(
+                                  width: width, movie: popularMovie);
+                            },
+                          ),
                         );
                       } else {
                         return Shimmer.fromColors(
                           baseColor: Colors.grey[300],
                           highlightColor: Colors.grey[100],
                           enabled: true,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: 4,
-                            scrollDirection: Axis.vertical,
+                          child: GridView.builder(
+                            itemCount: 8,
+                            gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
                             itemBuilder: (BuildContext context, int index) {
                               return NowPlayingMovieShimmerCard(width);
                             },
@@ -136,18 +144,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     }),
               ),
               StreamBuilder<bool>(
-                stream: _homeBloc.isLoadingStream,
-                builder: (context, snapshot) {
-                  return Container(
-                    height: snapshot.data ? 50.0 : 0,
-                    color: Colors.transparent,
-                    child: Center(
-                      child: new CircularProgressIndicator(),
-                    ),
-                  );
-                }
-              ),
-
+                  stream: _homeBloc.isLoadingStream,
+                  initialData: false,
+                  builder: (context, snapshot) {
+                    return Container(
+                      height: snapshot.data ? 50.0 : 0,
+                      color: Colors.transparent,
+                      child: Center(
+                        child: new CircularProgressIndicator(),
+                      ),
+                    );
+                  }),
             ],
           ),
         ),
@@ -156,12 +163,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-
   @override
   void dispose() {
-   _homeBloc.dispose();
+    _homeBloc.dispose();
     super.dispose();
   }
 }
-
-
